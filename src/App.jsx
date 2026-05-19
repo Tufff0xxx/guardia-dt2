@@ -26,6 +26,7 @@ function App() {
   const [fuera, setFuera] = useState([])
   const [base, setBase] = useState([])
   const [novedades, setNovedades] = useState([])
+  const [administrativos, setAdministrativos] = useState([])
   const [movilesActivos, setMovilesActivos] = useState([
   { sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: '' }
   
@@ -46,7 +47,9 @@ function App() {
     fetch(`${base}/MOVILES?key=${API_KEY}`).then(r => r.json()),
     fetch(`${base}/RUGGEAR?key=${API_KEY}`).then(r => r.json()),
     fetch(`${base}/HANDY?key=${API_KEY}`).then(r => r.json()),
-  ]).then(([dp, dm, dr, dh]) => {
+    fetch(`${base}/ADMINISTRATIVOS?key=${API_KEY}`).then(r => r.json()),
+    ]).then(([dp, dm, dr, dh, da]) => {
+  
     const listaPersonal = dp.values.slice(1)
       .filter(r => r[2] && r[3])
       .map(r => ({
@@ -55,6 +58,18 @@ function App() {
         nombre: r[3] || '',
         efectivo: r[0] || ''  // columna A, ya concatenada
     }))
+
+    const listaAdministrativos = da.values.slice(1)
+    .filter(r => r[2] && r[3])
+    .map(r => ({
+    dni: (r[1] || '').toString().replace(/,/g, '').trim(),
+    jerarquia: r[2] || '',
+    nombre: r[3] || '',
+    efectivo: r[0] || ''
+  }))
+
+setAdministrativos(listaAdministrativos)
+
     const listaMoviles = dm.values.slice(1)
       .filter(r => r[0])
       .map(r => ({
@@ -96,14 +111,7 @@ function App() {
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem' }}>
       <Header estado={estado} />
       <TabBar tabActiva={tabActiva} onChange={setTabActiva} />
-      {tabActiva === 'guardia' && (
-        <TabGuardia
-          personal={personal}
-          datos={guardia}
-          onChange={setGuardia}
-          
-        />
-      )}
+     
       {tabActiva === 'moviles' && (
   <TabMoviles
     personal={personal}
@@ -143,6 +151,14 @@ function App() {
     fuera={fuera}
     base={base}
     novedades={novedades}
+  />
+)}
+  {tabActiva === 'guardia' && (
+  <TabGuardia
+    personal={personal}
+    administrativos={administrativos}
+    datos={guardia}
+    onChange={setGuardia}
   />
 )}
     </div>
