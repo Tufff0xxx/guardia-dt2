@@ -27,6 +27,8 @@ function App() {
   const [base, setBase] = useState([])
   const [novedades, setNovedades] = useState([])
   const [administrativos, setAdministrativos] = useState([])
+  const [companiaFiltro, setCompaniaFiltro] = useState('')
+  const [companiaFiltroNovedades, setCompaniaFiltroNovedades] = useState('')
   const [movilesActivos, setMovilesActivos] = useState([
   { sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: '' }
   
@@ -51,12 +53,12 @@ function App() {
     ]).then(([dp, dm, dr, dh, da]) => {
   
     const listaPersonal = dp.values.slice(1)
-      .filter(r => r[2] && r[3])
       .map(r => ({
-        dni: (r[1] || '').toString().replace(/,/g, '').trim(),
-        jerarquia: r[2] || '',
-        nombre: r[3] || '',
-        efectivo: r[0] || ''  // columna A, ya concatenada
+      dni: (r[1] || '').toString().replace(/,/g, '').trim(),
+      jerarquia: r[2] || '',
+      nombre: r[3] || '',
+      efectivo: r[0] || '',
+      guardia: r[5] || ''   // ← esta línea
     }))
 
     const listaAdministrativos = da.values.slice(1)
@@ -113,15 +115,18 @@ setAdministrativos(listaAdministrativos)
       <TabBar tabActiva={tabActiva} onChange={setTabActiva} />
      
       {tabActiva === 'moviles' && (
-  <TabMoviles
+    <TabMoviles
     personal={personal}
     movilesData={movilesData}
     moviles={movilesActivos}
     onChange={setMovilesActivos}
     ruggers={ruggers}
     handys={handys}
+    companiaFiltro={companiaFiltro}
+    onCompaniaChange={setCompaniaFiltro}
   />
 )}
+
   {tabActiva === 'fuera' && (
   <TabFuera
     movilesData={movilesData}
@@ -137,12 +142,14 @@ setAdministrativos(listaAdministrativos)
   />
 )}
   {tabActiva === 'novedades' && (
-    <TabNovedades
-      personal={personal}
-      novedades={novedades}
-      onChange={setNovedades}
-    />
-  )}
+  <TabNovedades
+    personal={personal}
+    novedades={novedades}
+    onChange={setNovedades}
+    companiaFiltro={companiaFiltroNovedades}
+    onCompaniaChange={setCompaniaFiltroNovedades}
+  />
+)}
   {tabActiva === 'mensaje' && (
   <TabMensaje
     guardia={guardia}

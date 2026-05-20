@@ -1,4 +1,8 @@
-function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys }) {
+function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys, companiaFiltro, onCompaniaChange }) {
+
+  const personalFiltrado = companiaFiltro
+    ? personal.filter(p => p.guardia === companiaFiltro)
+    : personal
 
   function agregarMovil() {
     onChange([...moviles, {
@@ -22,6 +26,36 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys 
 
   return (
     <div>
+      {/* Filtro de compañía */}
+      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Filtrar personal por compañía</p>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {['', '1º', '2º', '3º'].map(c => (
+            <button
+              key={c}
+              onClick={() => onCompaniaChange(c)}
+              style={{
+                padding: '0.4rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #ccc',
+                background: companiaFiltro === c ? '#185fa5' : '#f5f5f3',
+                color: companiaFiltro === c ? '#fff' : '#1a1a18',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: companiaFiltro === c ? '600' : 'normal'
+              }}
+            >
+              {c === '' ? 'Todos' : `Compañía ${c}`}
+            </button>
+          ))}
+        </div>
+        <p style={{ fontSize: '12px', color: '#666', marginTop: '0.5rem' }}>
+          {companiaFiltro
+            ? `Mostrando ${personalFiltrado.length} efectivos de compañía ${companiaFiltro}`
+            : `Mostrando todos los efectivos (${personal.length})`}
+        </p>
+      </div>
+
       {moviles.map((m, i) => {
         const movilSeleccionado = movilesData.find(x => x.movil === m.movil)
         return (
@@ -59,7 +93,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys 
               <label style={labelStyle}>Jefe de Coche</label>
               <select style={inputStyle} value={m.p1} onChange={e => actualizarMovil(i, 'p1', e.target.value)}>
                 <option value="">-- seleccionar --</option>
-                {personal.map(p => (
+                {personalFiltrado.map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>
@@ -69,7 +103,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys 
               <label style={labelStyle}>Chofer</label>
               <select style={inputStyle} value={m.p2} onChange={e => actualizarMovil(i, 'p2', e.target.value)}>
                 <option value="">-- seleccionar --</option>
-                {personal.map(p => (
+                {personalFiltrado.map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>
@@ -92,9 +126,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys 
                 <select style={inputStyle} value={m.handy} onChange={e => actualizarMovil(i, 'handy', e.target.value)}>
                   <option value="">-- seleccionar --</option>
                   {handys.map(h => (
-                    <option key={h.numero} value={h.numero}>
-                      {h.numero}
-                    </option>
+                    <option key={h.numero} value={h.numero}>{h.numero}</option>
                   ))}
                 </select>
               </div>
