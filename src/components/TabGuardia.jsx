@@ -5,10 +5,11 @@ const ROLES = [
   'ARMERO',
   'LOGÍSTICO',
   'PUESTO 1',
+  'CASILLA CONGRESO',
   'OTRO'
 ]
 
-function TabGuardia({ personal, administrativos, datos, onChange }) {
+function TabGuardia({ personal, administrativos, datos, onChange, movilJefatura, onMovilJefatura, movilesData, ruggers, handys }) {
 
   function actualizarCampo(campo, valor) {
     onChange({ ...datos, [campo]: valor })
@@ -29,6 +30,10 @@ function TabGuardia({ personal, administrativos, datos, onChange }) {
   function eliminarRol(index) {
     const nuevosRoles = datos.roles.filter((_, i) => i !== index)
     onChange({ ...datos, roles: nuevosRoles })
+  }
+
+  function actualizarJefatura(campo, valor) {
+    onMovilJefatura({ ...movilJefatura, [campo]: valor })
   }
 
   const inputStyle = {
@@ -66,22 +71,14 @@ function TabGuardia({ personal, administrativos, datos, onChange }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '8px', alignItems: 'flex-end' }}>
               <div>
                 <label style={labelStyle}>Rol</label>
-                <select
-                  value={r.rol}
-                  onChange={e => actualizarRol(i, 'rol', e.target.value)}
-                  style={inputStyle}
-                >
+                <select value={r.rol} onChange={e => actualizarRol(i, 'rol', e.target.value)} style={inputStyle}>
                   {ROLES.map(rol => <option key={rol} value={rol}>{rol}</option>)}
                 </select>
               </div>
               <div>
                 <label style={labelStyle}>Efectivo</label>
                 {r.usarNomina ? (
-                  <select
-                    value={r.persona}
-                    onChange={e => actualizarRol(i, 'persona', e.target.value)}
-                    style={inputStyle}
-                  >
+                  <select value={r.persona} onChange={e => actualizarRol(i, 'persona', e.target.value)} style={inputStyle}>
                     <option value="">-- seleccionar --</option>
                     {personal.map(p => (
                       <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
@@ -110,10 +107,7 @@ function TabGuardia({ personal, administrativos, datos, onChange }) {
                   </select>
                 )}
               </div>
-              <button
-                onClick={() => eliminarRol(i)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px', paddingBottom: '4px' }}
-              >✕</button>
+              <button onClick={() => eliminarRol(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px', paddingBottom: '4px' }}>✕</button>
             </div>
             {r.usarNomina && (
               <button
@@ -134,15 +128,73 @@ function TabGuardia({ personal, administrativos, datos, onChange }) {
         >+ Agregar rol</button>
       </div>
 
-      {/* Casilla */}
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem' }}>
-        <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Casilla / Sector</p>
-        <input
-          value={datos.casilla}
-          onChange={e => actualizarCampo('casilla', e.target.value)}
-          placeholder="Ej: CASILLA CONGRESO – CUBRE DT 22"
-          style={inputStyle}
-        />
+      
+
+      {/* Móvil de Jefatura */}
+      <div style={{ border: '1.5px solid #185fa5', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '12px', fontWeight: '600', color: '#185fa5', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Móvil de Jefatura</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+          <div>
+            <label style={labelStyle}>Móvil (interno)</label>
+            <select style={inputStyle} value={movilJefatura.movil} onChange={e => actualizarJefatura('movil', e.target.value)}>
+              <option value="">-- seleccionar --</option>
+              {movilesData.map(mv => (
+                <option key={mv.movil} value={mv.movil}>
+                  {mv.movil} - {mv.dominio}{mv.estado !== 'NORMAL' ? ` [${mv.estado}]` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            {movilJefatura.movil && (
+              <p style={{ fontSize: '12px', color: '#185fa5', marginTop: '1.5rem' }}>
+                Dominio: <strong>{movilesData.find(x => x.movil === movilJefatura.movil)?.dominio}</strong>
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '8px' }}>
+          <label style={labelStyle}>Jefe</label>
+          <select style={inputStyle} value={movilJefatura.jefe} onChange={e => actualizarJefatura('jefe', e.target.value)}>
+            <option value="">-- seleccionar --</option>
+            {administrativos.map(p => (
+              <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ marginBottom: '8px' }}>
+          <label style={labelStyle}>Chofer</label>
+          <select style={inputStyle} value={movilJefatura.chofer} onChange={e => actualizarJefatura('chofer', e.target.value)}>
+            <option value="">-- seleccionar --</option>
+            {personal.map(p => (
+              <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div>
+            <label style={labelStyle}>Rugger</label>
+            <select style={inputStyle} value={movilJefatura.rugger} onChange={e => actualizarJefatura('rugger', e.target.value)}>
+              <option value="">-- seleccionar --</option>
+              {ruggers.map(r => (
+                <option key={r.interno} value={`${r.interno} - ${r.linea}`}>{r.interno} - {r.linea}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Handy</label>
+            <select style={inputStyle} value={movilJefatura.handy} onChange={e => actualizarJefatura('handy', e.target.value)}>
+              <option value="">-- seleccionar --</option>
+              {handys.map(h => (
+                <option key={h.numero} value={h.numero}>{h.numero}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   )

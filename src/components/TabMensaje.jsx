@@ -1,4 +1,4 @@
-function TabMensaje({ guardia, movilesActivos, movilesData, fuera, base, novedades }) {
+function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera, base, novedades }) {
 
   function formatFecha(d) {
     if (!d) return ''
@@ -13,7 +13,7 @@ function TabMensaje({ guardia, movilesActivos, movilesData, fuera, base, novedad
   function personLine(val) {
     const p = parsePerson(val)
     if (!p) return '▪️(sin asignar)'
-    return `▪️${p.efectivo}${p.dni ? ' DNI ' + p.dni : ''}`
+    return `▪️${p.efectivo || p.jerarquia + ' ' + p.nombre}${p.dni ? ' DNI ' + p.dni : ''}`
   }
 
   function generarTexto() {
@@ -27,9 +27,9 @@ function TabMensaje({ guardia, movilesActivos, movilesData, fuera, base, novedad
     msg += `*FECHA*: ${fecha}\n`
     msg += `*HORARIO*: ${horario}\n`
 
-    // Roles
+    // Roles de guardia
     if (guardia.roles.length) {
-      guardia.roles.forEach((r, i) => {
+      guardia.roles.forEach(r => {
         msg += `*${r.rol}*\n`
         msg += `${personLine(r.persona)}\n`
       })
@@ -37,6 +37,18 @@ function TabMensaje({ guardia, movilesActivos, movilesData, fuera, base, novedad
 
     if (casilla) msg += `*${casilla}*\n`
     msg += '\n'
+
+    // Móvil de jefatura
+    if (movilJefatura.movil || movilJefatura.jefe) {
+      const mv = movilesData.find(x => x.movil === movilJefatura.movil)
+      const dominio = mv ? mv.dominio : ''
+      msg += `*00) MÓVIL DE JEFATURA*\n`
+      if (movilJefatura.movil) msg += `Movil *${dominio}* (${movilJefatura.movil})\n`
+      msg += `${personLine(movilJefatura.jefe)}\n`
+      msg += `${personLine(movilJefatura.chofer)}\n`
+      msg += `Rugger: ${movilJefatura.rugger}\n`
+      msg += `Handy: ${movilJefatura.handy}\n\n`
+    }
 
     // Móviles activos
     movilesActivos.forEach((m, i) => {
@@ -56,7 +68,7 @@ function TabMensaje({ guardia, movilesActivos, movilesData, fuera, base, novedad
       msg += '*NOVEDADES*\n'
       novedades.forEach(n => {
         const p = parsePerson(n.persona)
-        if (p) msg += `▪️${p.efectivo} ${p.dni} ${n.detalle}\n`
+        if (p) msg += `▪️${p.efectivo || p.jerarquia + ' ' + p.nombre} ${p.dni} ${n.detalle}\n`
       })
       msg += '\n'
     }

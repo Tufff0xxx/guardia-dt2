@@ -28,6 +28,9 @@ function App() {
   const [novedades, setNovedades] = useState([])
   const [administrativos, setAdministrativos] = useState([])
   const [companiaFiltro, setCompaniaFiltro] = useState('')
+  const [movilJefatura, setMovilJefatura] = useState({
+  movil: '', jefe: '', chofer: '', rugger: '', handy: ''
+  })
   const [companiaFiltroNovedades, setCompaniaFiltroNovedades] = useState('')
   const [movilesActivos, setMovilesActivos] = useState([
   { sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: '' }
@@ -39,7 +42,6 @@ function App() {
     fecha: hoy(),
     horario: '',
     roles: [{ rol: 'JEFE DE GUARDIA', persona: '' }],
-    casilla: ''
   })
 
   useEffect(() => {
@@ -153,19 +155,25 @@ setAdministrativos(listaAdministrativos)
   {tabActiva === 'mensaje' && (
   <TabMensaje
     guardia={guardia}
+    movilJefatura={movilJefatura}
     movilesActivos={movilesActivos}
     movilesData={movilesData}
     fuera={fuera}
     base={base}
     novedades={novedades}
   />
-)}
-  {tabActiva === 'guardia' && (
+  )}
+    {tabActiva === 'guardia' && (
   <TabGuardia
     personal={personal}
     administrativos={administrativos}
     datos={guardia}
     onChange={setGuardia}
+    movilJefatura={movilJefatura}
+    onMovilJefatura={setMovilJefatura}
+    movilesData={movilesData}
+    ruggers={ruggers}
+    handys={handys}
   />
 )}
     </div>
