@@ -6,6 +6,7 @@ import TabMoviles from './components/TabMoviles'
 import TabFuera from './components/TabFuera'
 import TabBase from './components/TabBase'
 import TabNovedades from './components/TabNovedades'
+import { guardarBorrador, cargarBorrador } from './firebase'
 import TabMensaje from './components/TabMensaje'
 
 const SHEET_ID = '1fIZCewChVYl1oXmYsTLSeINtYj0Sr5--K3r11YBdwzM'
@@ -36,6 +37,56 @@ function App() {
   { sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: '' }
   
 ])
+
+  async function handleGuardarBorrador() {
+  const datos = {
+    guardia,
+    movilesActivos,
+    movilJefatura,
+    fuera,
+    base,
+    novedades
+  }
+  const ok = await guardarBorrador(datos)
+  alert(ok ? '✅ Borrador guardado correctamente' : '❌ Error al guardar')
+}
+
+async function handleCargarBorrador() {
+  const datos = await cargarBorrador()
+  if (!datos) { alert('No hay borrador guardado'); return }
+  if (datos.guardia) setGuardia(datos.guardia)
+  if (datos.movilesActivos) setMovilesActivos(datos.movilesActivos)
+  if (datos.movilJefatura) setMovilJefatura(datos.movilJefatura)
+  if (datos.fuera) setFuera(datos.fuera)
+  if (datos.base) setBase(datos.base)
+  if (datos.novedades) setNovedades(datos.novedades)
+  alert('✅ Borrador cargado correctamente')
+}
+
+  async function handleGuardarBorrador() {
+  const datos = {
+    guardia,
+    movilesActivos,
+    movilJefatura,
+    fuera,
+    base,
+    novedades
+  }
+  const ok = await guardarBorrador(datos)
+  alert(ok ? '✅ Borrador guardado correctamente' : '❌ Error al guardar')
+}
+
+async function handleCargarBorrador() {
+  const datos = await cargarBorrador()
+  if (!datos) { alert('No hay borrador guardado'); return }
+  if (datos.guardia) setGuardia(datos.guardia)
+  if (datos.movilesActivos) setMovilesActivos(datos.movilesActivos)
+  if (datos.movilJefatura) setMovilJefatura(datos.movilJefatura)
+  if (datos.fuera) setFuera(datos.fuera)
+  if (datos.base) setBase(datos.base)
+  if (datos.novedades) setNovedades(datos.novedades)
+  alert('✅ Borrador cargado correctamente')
+}
 
   const [guardia, setGuardia] = useState({
     division: 'DIVISION TERRITORIAL 2',
@@ -114,6 +165,16 @@ setAdministrativos(listaAdministrativos)
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem' }}>
       <Header estado={estado} />
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
+  <button
+    onClick={handleGuardarBorrador}
+    style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1px solid #3b6d11', background: '#eaf3de', color: '#3b6d11', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+  >💾 Guardar borrador</button>
+  <button
+    onClick={handleCargarBorrador}
+    style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1px solid #185fa5', background: '#e6f1fb', color: '#185fa5', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+  >📂 Cargar borrador</button>
+</div>
       <TabBar tabActiva={tabActiva} onChange={setTabActiva} />
      
       {tabActiva === 'moviles' && (

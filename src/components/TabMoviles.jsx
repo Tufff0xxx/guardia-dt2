@@ -58,6 +58,29 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
 
       {moviles.map((m, i) => {
         const movilSeleccionado = movilesData.find(x => x.movil === m.movil)
+
+        // Efectivos ya usados en otros móviles
+        const efectivosUsados = moviles
+          .filter((_, idx) => idx !== i)
+          .flatMap(mv => {
+            const d1 = (() => { try { return JSON.parse(mv.p1)?.dni } catch { return null } })()
+            const d2 = (() => { try { return JSON.parse(mv.p2)?.dni } catch { return null } })()
+            return [d1, d2]
+          })
+          .filter(Boolean)
+
+        // Móviles ya usados en otras tarjetas
+        const movilesUsados = moviles
+          .filter((_, idx) => idx !== i)
+          .map(mv => mv.movil)
+          .filter(Boolean)
+
+        // Personal filtrado por compañía y sin duplicados
+        const personalDisponible = personalFiltrado.filter(p => !efectivosUsados.includes(p.dni))
+
+        // Móviles disponibles sin duplicados
+        const movilesDisponibles = movilesData.filter(mv => !movilesUsados.includes(mv.movil))
+
         return (
           <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
@@ -74,7 +97,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
                 <label style={labelStyle}>Móvil (interno)</label>
                 <select style={inputStyle} value={m.movil} onChange={e => actualizarMovil(i, 'movil', e.target.value)}>
                   <option value="">-- seleccionar --</option>
-                  {movilesData.map(mv => (
+                  {movilesDisponibles.map(mv => (
                     <option key={mv.movil} value={mv.movil}>
                       {mv.movil} - {mv.dominio}{mv.estado !== 'NORMAL' ? ` [${mv.estado}]` : ''}
                     </option>
@@ -93,7 +116,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
               <label style={labelStyle}>Jefe de Coche</label>
               <select style={inputStyle} value={m.p1} onChange={e => actualizarMovil(i, 'p1', e.target.value)}>
                 <option value="">-- seleccionar --</option>
-                {personalFiltrado.map(p => (
+                {personalDisponible.map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>
@@ -103,7 +126,9 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
               <label style={labelStyle}>Chofer</label>
               <select style={inputStyle} value={m.p2} onChange={e => actualizarMovil(i, 'p2', e.target.value)}>
                 <option value="">-- seleccionar --</option>
-                {personalFiltrado.map(p => (
+                {personalDisponible.filter(p => {
+                  try { return JSON.parse(m.p1)?.dni !== p.dni } catch { return true }
+                }).map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>
