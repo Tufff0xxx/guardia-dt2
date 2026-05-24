@@ -1,8 +1,20 @@
-function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys, companiaFiltro, onCompaniaChange }) {
+function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys, companiaFiltro, onCompaniaChange, movilJefatura, infantes }) {
 
   const personalFiltrado = companiaFiltro
     ? personal.filter(p => p.guardia === companiaFiltro)
     : personal
+
+  // Ruggers ya usados en jefatura e infantes
+  const ruggersUsadosGlobal = [
+    movilJefatura?.rugger,
+    ...infantes.map(inf => inf.rugger)
+  ].filter(Boolean)
+
+  // Handys ya usados en jefatura e infantes
+  const handysUsadosGlobal = [
+    movilJefatura?.handy,
+    ...infantes.map(inf => inf.handy)
+  ].filter(Boolean)
 
   function agregarMovil() {
     onChange([...moviles, {
@@ -59,7 +71,6 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
       {moviles.map((m, i) => {
         const movilSeleccionado = movilesData.find(x => x.movil === m.movil)
 
-        // Efectivos ya usados en otros móviles
         const efectivosUsados = moviles
           .filter((_, idx) => idx !== i)
           .flatMap(mv => {
@@ -69,17 +80,28 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
           })
           .filter(Boolean)
 
-        // Móviles ya usados en otras tarjetas
         const movilesUsados = moviles
           .filter((_, idx) => idx !== i)
           .map(mv => mv.movil)
           .filter(Boolean)
 
-        // Personal filtrado por compañía y sin duplicados
         const personalDisponible = personalFiltrado.filter(p => !efectivosUsados.includes(p.dni))
-
-        // Móviles disponibles sin duplicados
         const movilesDisponibles = movilesData.filter(mv => !movilesUsados.includes(mv.movil))
+
+        // Ruggers usados en otros móviles + jefatura + infantes
+        const ruggersUsadosEnOtros = [
+          ...moviles.filter((_, idx) => idx !== i).map(mv => mv.rugger),
+          ...ruggersUsadosGlobal
+        ].filter(Boolean)
+
+        // Handys usados en otros móviles + jefatura + infantes
+        const handysUsadosEnOtros = [
+          ...moviles.filter((_, idx) => idx !== i).map(mv => mv.handy),
+          ...handysUsadosGlobal
+        ].filter(Boolean)
+
+        const ruggersDisponibles = ruggers.filter(r => !ruggersUsadosEnOtros.includes(`${r.interno} - ${r.linea}`))
+        const handysDisponibles = handys.filter(h => !handysUsadosEnOtros.includes(h.numero))
 
         return (
           <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
@@ -139,7 +161,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
                 <label style={labelStyle}>Rugger</label>
                 <select style={inputStyle} value={m.rugger} onChange={e => actualizarMovil(i, 'rugger', e.target.value)}>
                   <option value="">-- seleccionar --</option>
-                  {ruggers.map(r => (
+                  {ruggersDisponibles.map(r => (
                     <option key={r.interno} value={`${r.interno} - ${r.linea}`}>
                       {r.interno} - {r.linea}
                     </option>
@@ -150,7 +172,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
                 <label style={labelStyle}>Handy</label>
                 <select style={inputStyle} value={m.handy} onChange={e => actualizarMovil(i, 'handy', e.target.value)}>
                   <option value="">-- seleccionar --</option>
-                  {handys.map(h => (
+                  {handysDisponibles.map(h => (
                     <option key={h.numero} value={h.numero}>{h.numero}</option>
                   ))}
                 </select>

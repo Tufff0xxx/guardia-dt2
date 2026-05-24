@@ -1,6 +1,7 @@
 const TABS = [
   { id: 'guardia', label: 'Guardia' },
   { id: 'moviles', label: 'Móviles' },
+  { id: 'infantes', label: 'Infantes' },
   { id: 'fuera', label: 'Fuera de servicio' },
   { id: 'base', label: 'En base' },
   { id: 'novedades', label: 'Novedades' },

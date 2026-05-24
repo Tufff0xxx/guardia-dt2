@@ -1,4 +1,4 @@
-function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera, base, novedades }) {
+function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera, base, novedades, infantes }) {
 
   function formatFecha(d) {
     if (!d) return ''
@@ -20,7 +20,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
     const division = guardia.division || 'DIVISION TERRITORIAL 2'
     const fecha = formatFecha(guardia.fecha)
     const horario = guardia.horario || ''
-    const casilla = guardia.casilla || ''
 
     let msg = '💠'.repeat(8) + '\n'
     msg += `*${division}*\n`
@@ -30,38 +29,56 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
     // Roles de guardia
     if (guardia.roles.length) {
       guardia.roles.forEach(r => {
-        msg += `*${r.rol}*\n`
-        msg += `${personLine(r.persona)}\n`
+        const p = parsePerson(r.persona)
+        if (p) {
+          msg += `*${r.rol}*\n`
+          msg += `${personLine(r.persona)}\n`
+        }
       })
     }
-
-    if (casilla) msg += `*${casilla}*\n`
     msg += '\n'
 
     // Móvil de jefatura
-    if (movilJefatura.movil || movilJefatura.jefe) {
+    if (movilJefatura.jefe) {
       const mv = movilesData.find(x => x.movil === movilJefatura.movil)
       const dominio = mv ? mv.dominio : ''
       msg += `*00) MÓVIL DE JEFATURA*\n`
       if (movilJefatura.movil) msg += `Movil *${dominio}* (${movilJefatura.movil})\n`
       msg += `${personLine(movilJefatura.jefe)}\n`
-      msg += `${personLine(movilJefatura.chofer)}\n`
-      msg += `Rugger: ${movilJefatura.rugger}\n`
-      msg += `Handy: ${movilJefatura.handy}\n\n`
+      if (movilJefatura.chofer) msg += `${personLine(movilJefatura.chofer)}\n`
+      if (movilJefatura.rugger) msg += `Rugger: ${movilJefatura.rugger}\n`
+      if (movilJefatura.handy) msg += `Handy: ${movilJefatura.handy}\n`
+      msg += '\n'
     }
 
     // Móviles activos
-    movilesActivos.forEach((m, i) => {
-      const mv = movilesData.find(x => x.movil === m.movil)
-      const dominio = mv ? mv.dominio : ''
-      const obsStr = m.obs ? ` ${m.obs}` : ''
-      msg += `*${String(i + 1).padStart(2, '0')}) ${m.sector}*\n`
-      if (m.movil) msg += `Movil *${dominio}* (${m.movil})${obsStr}\n`
-      msg += `${personLine(m.p1)}\n`
-      msg += `${personLine(m.p2)}\n`
-      msg += `Rugger: ${m.rugger}\n`
-      msg += `Handy: ${m.handy}\n\n`
-    })
+    movilesActivos
+      .filter(m => m.movil || m.p1 || m.p2)
+      .forEach((m, i) => {
+        const mv = movilesData.find(x => x.movil === m.movil)
+        const dominio = mv ? mv.dominio : ''
+        const obsStr = m.obs ? ` ${m.obs}` : ''
+        msg += `*${String(i + 1).padStart(2, '0')}) ${m.sector}*\n`
+        if (m.movil) msg += `Movil *${dominio}* (${m.movil})${obsStr}\n`
+        if (m.p1) msg += `${personLine(m.p1)}\n`
+        if (m.p2) msg += `${personLine(m.p2)}\n`
+        if (m.rugger) msg += `Rugger: ${m.rugger}\n`
+        if (m.handy) msg += `Handy: ${m.handy}\n`
+        msg += '\n'
+      })
+
+    // Infantes
+    if (infantes.length) {
+      msg += '*INFANTES*\n'
+      infantes.forEach(inf => {
+        msg += `${inf.sector}${inf.rugger ? ' Con Rugger ' + inf.rugger : ''}\n`
+        if (inf.obs) msg += `(${inf.obs})\n`
+        if (inf.e1) msg += `${personLine(inf.e1)}\n`
+        if (inf.e2) msg += `${personLine(inf.e2)}\n`
+        if (inf.e3) msg += `${personLine(inf.e3)}\n`
+      })
+      msg += '\n'
+    }
 
     // Novedades
     if (novedades.length) {

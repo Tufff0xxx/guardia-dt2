@@ -6,6 +6,7 @@ import TabMoviles from './components/TabMoviles'
 import TabFuera from './components/TabFuera'
 import TabBase from './components/TabBase'
 import TabNovedades from './components/TabNovedades'
+import TabInfantes from './components/TabInfantes'
 import { guardarBorrador, cargarBorrador } from './firebase'
 import TabMensaje from './components/TabMensaje'
 
@@ -29,6 +30,8 @@ function App() {
   const [novedades, setNovedades] = useState([])
   const [administrativos, setAdministrativos] = useState([])
   const [companiaFiltro, setCompaniaFiltro] = useState('')
+  const [infantes, setInfantes] = useState([])
+  const [companiaFiltroInfantes, setCompaniaFiltroInfantes] = useState('')
   const [movilJefatura, setMovilJefatura] = useState({
   movil: '', jefe: '', chofer: '', rugger: '', handy: ''
   })
@@ -70,7 +73,8 @@ async function handleCargarBorrador() {
     movilJefatura,
     fuera,
     base,
-    novedades
+    novedades,
+    infantes
   }
   const ok = await guardarBorrador(datos)
   alert(ok ? '✅ Borrador guardado correctamente' : '❌ Error al guardar')
@@ -85,6 +89,7 @@ async function handleCargarBorrador() {
   if (datos.fuera) setFuera(datos.fuera)
   if (datos.base) setBase(datos.base)
   if (datos.novedades) setNovedades(datos.novedades)
+  if (datos.infantes) setInfantes(datos.infantes)
   alert('✅ Borrador cargado correctamente')
 }
 
@@ -187,6 +192,8 @@ setAdministrativos(listaAdministrativos)
     handys={handys}
     companiaFiltro={companiaFiltro}
     onCompaniaChange={setCompaniaFiltro}
+    movilJefatura={movilJefatura}
+    infantes={infantes}
   />
 )}
 
@@ -222,6 +229,7 @@ setAdministrativos(listaAdministrativos)
     fuera={fuera}
     base={base}
     novedades={novedades}
+    infantes={infantes}
   />
   )}
     {tabActiva === 'guardia' && (
@@ -235,6 +243,20 @@ setAdministrativos(listaAdministrativos)
     movilesData={movilesData}
     ruggers={ruggers}
     handys={handys}
+  />
+)}
+
+  {tabActiva === 'infantes' && (
+  <TabInfantes
+    personal={personal}
+    ruggers={ruggers}
+    handys={handys}
+    infantes={infantes}
+    onChange={setInfantes}
+    movilesActivos={movilesActivos}
+    movilJefatura={movilJefatura}
+    companiaFiltro={companiaFiltroInfantes}
+    onCompaniaChange={setCompaniaFiltroInfantes}
   />
 )}
     </div>
