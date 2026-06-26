@@ -4,13 +4,11 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
     ? personal.filter(p => p.guardia === companiaFiltro)
     : personal
 
-  // Ruggers ya usados en jefatura e infantes
   const ruggersUsadosGlobal = [
     movilJefatura?.rugger,
     ...infantes.map(inf => inf.rugger)
   ].filter(Boolean)
 
-  // Handys ya usados en jefatura e infantes
   const handysUsadosGlobal = [
     movilJefatura?.handy,
     ...infantes.map(inf => inf.handy)
@@ -18,7 +16,7 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
 
   function agregarMovil() {
     onChange([...moviles, {
-      sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: ''
+      sector: '', movil: '', p1: '', p2: '', p3: '', rugger: '', handy: '', obs: ''
     }])
   }
 
@@ -38,7 +36,6 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
 
   return (
     <div>
-      {/* Filtro de compañía */}
       <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
         <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Filtrar personal por compañía</p>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -76,7 +73,8 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
           .flatMap(mv => {
             const d1 = (() => { try { return JSON.parse(mv.p1)?.dni } catch { return null } })()
             const d2 = (() => { try { return JSON.parse(mv.p2)?.dni } catch { return null } })()
-            return [d1, d2]
+            const d3 = (() => { try { return JSON.parse(mv.p3)?.dni } catch { return null } })()
+            return [d1, d2, d3]
           })
           .filter(Boolean)
 
@@ -88,13 +86,11 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
         const personalDisponible = personalFiltrado.filter(p => !efectivosUsados.includes(p.dni))
         const movilesDisponibles = movilesData.filter(mv => !movilesUsados.includes(mv.movil))
 
-        // Ruggers usados en otros móviles + jefatura + infantes
         const ruggersUsadosEnOtros = [
           ...moviles.filter((_, idx) => idx !== i).map(mv => mv.rugger),
           ...ruggersUsadosGlobal
         ].filter(Boolean)
 
-        // Handys usados en otros móviles + jefatura + infantes
         const handysUsadosEnOtros = [
           ...moviles.filter((_, idx) => idx !== i).map(mv => mv.handy),
           ...handysUsadosGlobal
@@ -102,6 +98,9 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
 
         const ruggersDisponibles = ruggers.filter(r => !ruggersUsadosEnOtros.includes(`${r.interno} - ${r.linea}`))
         const handysDisponibles = handys.filter(h => !handysUsadosEnOtros.includes(h.numero))
+
+        const p1Dni = (() => { try { return JSON.parse(m.p1)?.dni } catch { return null } })()
+        const p2Dni = (() => { try { return JSON.parse(m.p2)?.dni } catch { return null } })()
 
         return (
           <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
@@ -148,9 +147,17 @@ function TabMoviles({ personal, movilesData, moviles, onChange, ruggers, handys,
               <label style={labelStyle}>Chofer</label>
               <select style={inputStyle} value={m.p2} onChange={e => actualizarMovil(i, 'p2', e.target.value)}>
                 <option value="">-- seleccionar --</option>
-                {personalDisponible.filter(p => {
-                  try { return JSON.parse(m.p1)?.dni !== p.dni } catch { return true }
-                }).map(p => (
+                {personalDisponible.filter(p => p.dni !== p1Dni).map(p => (
+                  <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '8px' }}>
+              <label style={labelStyle}>Efectivo 3 (opcional)</label>
+              <select style={inputStyle} value={m.p3} onChange={e => actualizarMovil(i, 'p3', e.target.value)}>
+                <option value="">-- sin asignar --</option>
+                {personalDisponible.filter(p => p.dni !== p1Dni && p.dni !== p2Dni).map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>

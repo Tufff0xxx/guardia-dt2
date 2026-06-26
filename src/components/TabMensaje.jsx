@@ -62,6 +62,7 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
         if (m.movil) msg += `Movil *${dominio}* (${m.movil})${obsStr}\n`
         if (m.p1) msg += `${personLine(m.p1)}\n`
         if (m.p2) msg += `${personLine(m.p2)}\n`
+        if (m.p3) msg += `${personLine(m.p3)}\n`
         if (m.rugger) msg += `Rugger: ${m.rugger}\n`
         if (m.handy) msg += `Handy: ${m.handy}\n`
         msg += '\n'

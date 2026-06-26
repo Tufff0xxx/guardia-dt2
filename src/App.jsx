@@ -37,7 +37,7 @@ function App() {
   })
   const [companiaFiltroNovedades, setCompaniaFiltroNovedades] = useState('')
   const [movilesActivos, setMovilesActivos] = useState([
-  { sector: '', movil: '', p1: '', p2: '', rugger: '', handy: '', obs: '' }
+  { sector: '', movil: '', p1: '', p2: '', rugger: '',p3: '', handy: '', obs: '' }
   
 ])
 
