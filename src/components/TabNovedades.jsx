@@ -1,19 +1,27 @@
 function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompaniaChange }) {
 
+  function companiaDeNovedad(persona) {
+    try { return JSON.parse(persona)?.guardia } catch { return null }
+  }
+
   const personalFiltrado = companiaFiltro
     ? personal.filter(p => p.guardia === companiaFiltro)
     : personal
 
+  const novedadesFiltradas = companiaFiltro
+  ? novedades.filter(n => companiaDeNovedad(n.persona) === companiaFiltro || !n.persona)
+  : novedades
+
   function agregar() {
-    onChange([...novedades, { persona: '', detalle: '' }])
+    onChange([...novedades, { persona: '', detalle: '', automatico: false }])
   }
 
-  function actualizar(index, campo, valor) {
-    onChange(novedades.map((n, i) => i === index ? { ...n, [campo]: valor } : n))
+  function actualizar(novedadOriginal, campo, valor) {
+    onChange(novedades.map(n => n === novedadOriginal ? { ...n, [campo]: valor } : n))
   }
 
-  function eliminar(index) {
-    onChange(novedades.filter((_, i) => i !== index))
+  function eliminar(novedadOriginal) {
+    onChange(novedades.filter(n => n !== novedadOriginal))
   }
 
   const inputStyle = {
@@ -26,7 +34,7 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
     <div>
       {/* Filtro de compañía */}
       <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
-        <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Filtrar personal por compañía</p>
+        <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Filtrar por compañía</p>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {['', '1º', '2º', '3º'].map(c => (
             <button
@@ -49,21 +57,28 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
         </div>
         <p style={{ fontSize: '12px', color: '#666', marginTop: '0.5rem' }}>
           {companiaFiltro
-            ? `Mostrando ${personalFiltrado.length} efectivos de compañía ${companiaFiltro}`
-            : `Mostrando todos los efectivos (${personal.length})`}
+            ? `Mostrando ${novedadesFiltradas.length} novedades de compañía ${companiaFiltro}`
+            : `Mostrando todas las novedades (${novedades.length})`}
         </p>
       </div>
 
-      {novedades.map((n, i) => (
+      {novedadesFiltradas.map((n, i) => (
         <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontWeight: '600' }}>Novedad #{i + 1}</span>
-            <button onClick={() => eliminar(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px' }}>✕</button>
+            <span style={{ fontWeight: '600' }}>
+              Novedad #{i + 1}
+              {n.automatico && (
+                <span style={{ fontSize: '11px', color: '#3b6d11', background: '#eaf3de', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px' }}>
+                  Automático
+                </span>
+              )}
+            </span>
+            <button onClick={() => eliminar(n)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px' }}>✕</button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '8px' }}>
             <div>
               <label style={labelStyle}>Efectivo</label>
-              <select style={inputStyle} value={n.persona} onChange={e => actualizar(i, 'persona', e.target.value)}>
+              <select style={inputStyle} value={n.persona} onChange={e => actualizar(n, 'persona', e.target.value)}>
                 <option value="">-- seleccionar --</option>
                 {personalFiltrado.map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
@@ -76,7 +91,7 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
                 style={inputStyle}
                 placeholder="Ej: ART 55 INC D 29/01 AL 28/07"
                 value={n.detalle}
-                onChange={e => actualizar(i, 'detalle', e.target.value)}
+                onChange={e => actualizar(n, 'detalle', e.target.value)}
               />
             </div>
           </div>

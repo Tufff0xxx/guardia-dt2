@@ -1,4 +1,4 @@
-function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera, base, novedades, infantes }) {
+function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera, base, novedades, infantes, companiaFiltroNovedades }) {
 
   function formatFecha(d) {
     if (!d) return ''
@@ -26,7 +26,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
     msg += `*FECHA*: ${fecha}\n`
     msg += `*HORARIO*: ${horario}\n`
 
-    // Roles de guardia
     if (guardia.roles.length) {
       guardia.roles.forEach(r => {
         const p = parsePerson(r.persona)
@@ -38,7 +37,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
     }
     msg += '\n'
 
-    // Móvil de jefatura
     if (movilJefatura.jefe) {
       const mv = movilesData.find(x => x.movil === movilJefatura.movil)
       const dominio = mv ? mv.dominio : ''
@@ -51,7 +49,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
       msg += '\n'
     }
 
-    // Móviles activos
     movilesActivos
       .filter(m => m.movil || m.p1 || m.p2)
       .forEach((m, i) => {
@@ -68,7 +65,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
         msg += '\n'
       })
 
-    // Infantes
     if (infantes.length) {
       msg += '*INFANTES*\n'
       infantes.forEach(inf => {
@@ -81,17 +77,23 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
       msg += '\n'
     }
 
-    // Novedades
-    if (novedades.length) {
+    // Novedades filtradas por compañía
+    function companiaDeNovedad(persona) {
+      try { return JSON.parse(persona)?.guardia } catch { return null }
+    }
+    const novedadesFiltradas = companiaFiltroNovedades
+      ? novedades.filter(n => companiaDeNovedad(n.persona) === companiaFiltroNovedades)
+      : novedades
+
+    if (novedadesFiltradas.length) {
       msg += '*NOVEDADES*\n'
-      novedades.forEach(n => {
+      novedadesFiltradas.forEach(n => {
         const p = parsePerson(n.persona)
         if (p) msg += `▪️${p.efectivo || p.jerarquia + ' ' + p.nombre} ${p.dni} ${n.detalle}\n`
       })
       msg += '\n'
     }
 
-    // Fuera de servicio
     if (fuera.length) {
       msg += `❌*MOVILES FUERA DE SERVICIO ${fuera.length}*❌\n`
       fuera.forEach(f => {
@@ -102,7 +104,6 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
       msg += '\n'
     }
 
-    // En base
     if (base.length) {
       msg += '*MOVILES EN BASE*\n'
       base.forEach(b => {

@@ -48,31 +48,6 @@ function App() {
     movilJefatura,
     fuera,
     base,
-    novedades
-  }
-  const ok = await guardarBorrador(datos)
-  alert(ok ? '✅ Borrador guardado correctamente' : '❌ Error al guardar')
-}
-
-async function handleCargarBorrador() {
-  const datos = await cargarBorrador()
-  if (!datos) { alert('No hay borrador guardado'); return }
-  if (datos.guardia) setGuardia(datos.guardia)
-  if (datos.movilesActivos) setMovilesActivos(datos.movilesActivos)
-  if (datos.movilJefatura) setMovilJefatura(datos.movilJefatura)
-  if (datos.fuera) setFuera(datos.fuera)
-  if (datos.base) setBase(datos.base)
-  if (datos.novedades) setNovedades(datos.novedades)
-  alert('✅ Borrador cargado correctamente')
-}
-
-  async function handleGuardarBorrador() {
-  const datos = {
-    guardia,
-    movilesActivos,
-    movilJefatura,
-    fuera,
-    base,
     novedades,
     infantes
   }
@@ -111,13 +86,25 @@ async function handleCargarBorrador() {
     ]).then(([dp, dm, dr, dh, da]) => {
   
     const listaPersonal = dp.values.slice(1)
-      .map(r => ({
-      dni: (r[1] || '').toString().replace(/,/g, '').trim(),
-      jerarquia: r[2] || '',
-      nombre: r[3] || '',
-      efectivo: r[0] || '',
-      guardia: r[5] || ''   // ← esta línea
-    }))
+    .map(r => ({
+    dni: (r[1] || '').toString().replace(/,/g, '').trim(),
+    jerarquia: r[2] || '',
+    nombre: r[3] || '',
+    efectivo: r[0] || '',
+    guardia: r[5] || '',
+    situacion: r[6] || 'NORMAL',
+    detalle: r[7] || '',
+    desde: r[8] || '',
+    hasta: r[9] || ''
+  }))
+
+    const novedadesAuto = listaPersonal
+    .filter(p => p.situacion !== 'NORMAL' && p.situacion !== 'TNO')
+    .map(p => ({
+    persona: JSON.stringify(p),
+    detalle: `${p.situacion}${p.detalle ? ' ' + p.detalle : ''}${p.desde ? ' DESDE ' + p.desde : ''}${p.hasta ? ' HASTA ' + p.hasta : ''}`,
+    automatico: true
+  }))
 
     const listaAdministrativos = da.values.slice(1)
     .filter(r => r[2] && r[3])
@@ -163,10 +150,16 @@ setAdministrativos(listaAdministrativos)
     setFuera(listaFuera)
     setRuggers(listaRugger)
     setHandys(listaHandy)
+    setNovedades(novedadesAuto)
     setEstado(`${listaPersonal.length} efectivos · ${listaMoviles.length} móviles cargados`)
   }).catch(() => setEstado('⚠️ Error al conectar con Google Sheets'))
 }, [])
-
+  const dnisConNovedad = new Set(
+    novedades
+      .map(n => { try { return JSON.parse(n.persona)?.dni } catch { return null } })
+      .filter(Boolean)
+  )
+  const personalDisponibleGuardia = personal.filter(p => !dnisConNovedad.has(p.dni))
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem' }}>
       <Header estado={estado} />
@@ -184,7 +177,7 @@ setAdministrativos(listaAdministrativos)
      
       {tabActiva === 'moviles' && (
     <TabMoviles
-    personal={personal}
+    personal={personalDisponibleGuardia}
     movilesData={movilesData}
     moviles={movilesActivos}
     onChange={setMovilesActivos}
@@ -205,10 +198,12 @@ setAdministrativos(listaAdministrativos)
   />
 )}
   {tabActiva === 'base' && (
-    <TabBase
-      movilesData={movilesData}
-      base={base}
-      onChange={setBase}
+  <TabBase
+    movilesData={movilesData}
+    base={base}
+    onChange={setBase}
+    movilesActivos={movilesActivos}
+    movilJefatura={movilJefatura}
   />
 )}
   {tabActiva === 'novedades' && (
@@ -230,11 +225,13 @@ setAdministrativos(listaAdministrativos)
     base={base}
     novedades={novedades}
     infantes={infantes}
+    personal={personal}
+    companiaFiltroNovedades={companiaFiltroNovedades}
   />
   )}
     {tabActiva === 'guardia' && (
   <TabGuardia
-    personal={personal}
+    personal={personalDisponibleGuardia}
     administrativos={administrativos}
     datos={guardia}
     onChange={setGuardia}
@@ -248,7 +245,7 @@ setAdministrativos(listaAdministrativos)
 
   {tabActiva === 'infantes' && (
   <TabInfantes
-    personal={personal}
+    personal={personalDisponibleGuardia}
     ruggers={ruggers}
     handys={handys}
     infantes={infantes}

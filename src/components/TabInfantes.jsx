@@ -5,10 +5,11 @@ function TabInfantes({ personal, ruggers, handys, infantes, onChange, movilesAct
     : personal
 
   const efectivosEnMoviles = movilesActivos.flatMap(m => {
-    const d1 = (() => { try { return JSON.parse(m.p1)?.dni } catch { return null } })()
-    const d2 = (() => { try { return JSON.parse(m.p2)?.dni } catch { return null } })()
-    return [d1, d2]
-  }).filter(Boolean)
+  const d1 = (() => { try { return JSON.parse(m.p1)?.dni } catch { return null } })()
+  const d2 = (() => { try { return JSON.parse(m.p2)?.dni } catch { return null } })()
+  const d3 = (() => { try { return JSON.parse(m.p3)?.dni } catch { return null } })()
+  return [d1, d2, d3]
+}).filter(Boolean)
 
   // Ruggers usados en móviles y jefatura
   const ruggersUsadosGlobal = [

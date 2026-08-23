@@ -1,4 +1,10 @@
-function TabBase({ movilesData, base, onChange }) {
+function TabBase({ movilesData, base, onChange, movilesActivos, movilJefatura }) {
+
+  // Móviles ya usados en Móviles activos y Jefatura
+  const movilesUsados = [
+    movilJefatura?.movil,
+    ...movilesActivos.map(m => m.movil)
+  ].filter(Boolean)
 
   function agregar() {
     onChange([...base, { movil: '' }])
@@ -20,22 +26,34 @@ function TabBase({ movilesData, base, onChange }) {
 
   return (
     <div>
-      {base.map((b, i) => (
-        <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
-          <div style={{ flex: 1 }}>
-            <label style={labelStyle}>Móvil en base</label>
-            <select style={inputStyle} value={b.movil} onChange={e => actualizar(i, e.target.value)}>
-              <option value="">-- seleccionar --</option>
-              {movilesData.map(mv => (
-                <option key={mv.movil} value={mv.movil}>
-                  {mv.movil} - {mv.dominio}
-                </option>
-              ))}
-            </select>
+      {base.map((b, i) => {
+        // Móviles usados en otras tarjetas de "en base"
+        const usadosEnOtrasBase = base
+          .filter((_, idx) => idx !== i)
+          .map(x => x.movil)
+          .filter(Boolean)
+
+        const movilesDisponibles = movilesData.filter(mv =>
+          !movilesUsados.includes(mv.movil) && !usadosEnOtrasBase.includes(mv.movil)
+        )
+
+        return (
+          <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'flex-end', gap: '8px' }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Móvil en base</label>
+              <select style={inputStyle} value={b.movil} onChange={e => actualizar(i, e.target.value)}>
+                <option value="">-- seleccionar --</option>
+                {movilesDisponibles.map(mv => (
+                  <option key={mv.movil} value={mv.movil}>
+                    {mv.movil} - {mv.dominio}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button onClick={() => eliminar(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px', paddingBottom: '6px' }}>✕</button>
           </div>
-          <button onClick={() => eliminar(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px', paddingBottom: '6px' }}>✕</button>
-        </div>
-      ))}
+        )
+      })}
 
       <button
         onClick={agregar}
