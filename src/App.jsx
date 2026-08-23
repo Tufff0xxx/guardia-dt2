@@ -9,6 +9,7 @@ import TabNovedades from './components/TabNovedades'
 import TabInfantes from './components/TabInfantes'
 import { guardarBorrador, cargarBorrador } from './firebase'
 import TabMensaje from './components/TabMensaje'
+import './App.css'
 
 const SHEET_ID = '1fIZCewChVYl1oXmYsTLSeINtYj0Sr5--K3r11YBdwzM'
 const API_KEY = 'AIzaSyCVLH6YMTyytuVDkICayvjxtTow8t0l3cY'
@@ -161,16 +162,16 @@ setAdministrativos(listaAdministrativos)
   )
   const personalDisponibleGuardia = personal.filter(p => !dnisConNovedad.has(p.dni))
   return (
-    <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem' }}>
+    <div className="app-container">
       <Header estado={estado} />
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
+      <div className="toolbar">
   <button
     onClick={handleGuardarBorrador}
-    style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1px solid #3b6d11', background: '#eaf3de', color: '#3b6d11', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+    style={{ padding: '0.6rem 1rem', minHeight: '44px', borderRadius: '8px', border: '1px solid #3b6d11', background: '#eaf3de', color: '#3b6d11', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
   >💾 Guardar borrador</button>
   <button
     onClick={handleCargarBorrador}
-    style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1px solid #185fa5', background: '#e6f1fb', color: '#185fa5', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
+    style={{ padding: '0.6rem 1rem', minHeight: '44px', borderRadius: '8px', border: '1px solid #185fa5', background: '#e6f1fb', color: '#185fa5', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
   >📂 Cargar borrador</button>
 </div>
       <TabBar tabActiva={tabActiva} onChange={setTabActiva} />

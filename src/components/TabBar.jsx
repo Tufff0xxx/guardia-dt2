@@ -10,19 +10,15 @@ const TABS = [
 
 function TabBar({ tabActiva, onChange }) {
   return (
-    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+    <div className="tab-bar">
       {TABS.map(tab => (
         <button
           key={tab.id}
           onClick={() => onChange(tab.id)}
+          className="chip-btn"
           style={{
-            padding: '0.4rem 0.9rem',
-            borderRadius: '8px',
-            border: '1px solid #ccc',
             background: tabActiva === tab.id ? '#fff' : '#f5f5f3',
             fontWeight: tabActiva === tab.id ? '600' : 'normal',
-            cursor: 'pointer',
-            fontSize: '13px'
           }}
         >
           {tab.label}

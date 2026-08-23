@@ -24,30 +24,20 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
     onChange(novedades.filter(n => n !== novedadOriginal))
   }
 
-  const inputStyle = {
-    width: '90%', padding: '0.45rem 0.75rem',
-    borderRadius: '8px', border: '1px solid #ccc', fontSize: '14px'
-  }
-  const labelStyle = { fontSize: '12px', color: '#666', display: 'block', marginBottom: '4px' }
-
   return (
     <div>
       {/* Filtro de compañía */}
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '1rem' }}>
-        <p style={{ fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '0.75rem', textTransform: 'uppercase' }}>Filtrar por compañía</p>
+      <div className="card">
+        <p className="card-title">Filtrar por compañía</p>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {['', '1º', '2º', '3º'].map(c => (
             <button
               key={c}
               onClick={() => onCompaniaChange(c)}
+              className="chip-btn"
               style={{
-                padding: '0.4rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #ccc',
                 background: companiaFiltro === c ? '#185fa5' : '#f5f5f3',
                 color: companiaFiltro === c ? '#fff' : '#1a1a18',
-                cursor: 'pointer',
-                fontSize: '13px',
                 fontWeight: companiaFiltro === c ? '600' : 'normal'
               }}
             >
@@ -63,8 +53,8 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
       </div>
 
       {novedadesFiltradas.map((n, i) => (
-        <div key={i} style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        <div key={i} className="card">
+          <div className="card-row">
             <span style={{ fontWeight: '600' }}>
               Novedad #{i + 1}
               {n.automatico && (
@@ -73,22 +63,22 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
                 </span>
               )}
             </span>
-            <button onClick={() => eliminar(n)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#a32d2d', fontSize: '18px' }}>✕</button>
+            <button onClick={() => eliminar(n)} className="btn-icon-delete">✕</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '8px' }}>
-            <div>
-              <label style={labelStyle}>Efectivo</label>
-              <select style={inputStyle} value={n.persona} onChange={e => actualizar(n, 'persona', e.target.value)}>
+          <div className="grid-1-2">
+            <div className="field">
+              <label className="field-label">Efectivo</label>
+              <select className="field-select" value={n.persona} onChange={e => actualizar(n, 'persona', e.target.value)}>
                 <option value="">-- seleccionar --</option>
                 {personalFiltrado.map(p => (
                   <option key={p.dni} value={JSON.stringify(p)}>{p.efectivo}</option>
                 ))}
               </select>
             </div>
-            <div>
-              <label style={labelStyle}>Detalle</label>
+            <div className="field">
+              <label className="field-label">Detalle</label>
               <input
-                style={inputStyle}
+                className="field-input"
                 placeholder="Ej: ART 55 INC D 29/01 AL 28/07"
                 value={n.detalle}
                 onChange={e => actualizar(n, 'detalle', e.target.value)}
@@ -98,10 +88,7 @@ function TabNovedades({ personal, novedades, onChange, companiaFiltro, onCompani
         </div>
       ))}
 
-      <button
-        onClick={agregar}
-        style={{ width: '100%', padding: '0.5rem', borderRadius: '8px', border: '1px dashed #185fa5', background: 'none', color: '#185fa5', cursor: 'pointer', fontSize: '13px' }}
-      >+ Agregar novedad</button>
+      <button onClick={agregar} className="btn-add">+ Agregar novedad</button>
     </div>
   )
 }

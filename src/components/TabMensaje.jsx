@@ -128,21 +128,21 @@ function TabMensaje({ guardia, movilJefatura, movilesActivos, movilesData, fuera
 
   return (
     <div>
-      <div style={{ border: '1px solid #ddd', borderRadius: '12px', padding: '1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+      <div className="card">
+        <div className="output-actions">
           <span style={{ fontSize: '12px', fontWeight: '600', color: '#666', textTransform: 'uppercase' }}>Mensaje generado</span>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button
               onClick={() => document.getElementById('output').textContent = generarTexto()}
-              style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1.5px solid #333', background: '#fff', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}
+              style={{ padding: '0.6rem 1rem', minHeight: '44px', borderRadius: '8px', border: '1.5px solid #333', background: '#fff', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}
             >⚡ Generar</button>
             <button
               onClick={copiar}
-              style={{ padding: '0.45rem 1rem', borderRadius: '8px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer', fontSize: '14px' }}
+              style={{ padding: '0.6rem 1rem', minHeight: '44px', borderRadius: '8px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer', fontSize: '14px' }}
             >📋 Copiar</button>
           </div>
         </div>
-        <pre id="output" style={{ background: '#f5f5f3', borderRadius: '8px', padding: '1rem', fontSize: '12px', lineHeight: '1.7', whiteSpace: 'pre-wrap', maxHeight: '450px', overflowY: 'auto', color: '#1a1a18' }}>
+        <pre id="output" className="output-box">
           El mensaje aparecerá aquí...
         </pre>
       </div>
